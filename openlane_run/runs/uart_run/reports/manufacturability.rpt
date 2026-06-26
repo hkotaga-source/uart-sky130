@@ -1,0 +1,19 @@
+Design Name: uart_top
+Run Directory: /work/uart/openlane_run/runs/uart_run
+----------------------------------------
+
+Magic DRC Summary:
+Source: /work/uart/openlane_run/runs/uart_run/reports/signoff/drc.rpt
+Total Magic DRC violations is 0
+----------------------------------------
+
+LVS Summary:
+Source: /work/uart/openlane_run/runs/uart_run/logs/signoff/41-uart_top.lef.lvs.log
+Number of nets: 589                        |Number of nets: 589                        
+Design is LVS clean.
+----------------------------------------
+
+Antenna Summary:
+Source: /work/uart/openlane_run/runs/uart_run/logs/signoff/44-arc.log
+Pin violations: 0
+Net violations: 0

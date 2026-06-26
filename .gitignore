@@ -1,0 +1,5 @@
+openlane_run/runs/*/logs/
+openlane_run/runs/*/tmp/
+openlane_run/runs/*/results/
+*.vcd
+*.sim
