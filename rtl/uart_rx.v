@@ -17,6 +17,21 @@ module uart_rx (
     reg [2:0]  bit_cnt;
     reg [7:0]  shift_reg;
 
+    // 2-flop synchronizer: rx comes from another device's clock domain,
+    // so pass it through two flip-flops before using it to avoid
+    // metastability. Reset to 1 because an idle UART line is high.
+    reg rx_meta, rx_sync;
+
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
+            rx_meta <= 1'b1;
+            rx_sync <= 1'b1;
+        end else begin
+            rx_meta <= rx;
+            rx_sync <= rx_meta;
+        end
+    end
+
     always @(posedge clk or posedge rst) begin
         if (rst) begin
             state    <= IDLE;
@@ -29,7 +44,7 @@ module uart_rx (
             valid <= 0;
             case (state)
                 IDLE: begin
-                    if (rx == 1'b0) begin
+                    if (rx_sync == 1'b0) begin
                         baud_cnt <= baud_div >> 1;
                         state    <= START;
                     end
@@ -37,7 +52,7 @@ module uart_rx (
 
                 START: begin
                     if (baud_cnt == 0) begin
-                        if (rx == 1'b0) begin
+                        if (rx_sync == 1'b0) begin
                             baud_cnt <= baud_div;
                             bit_cnt  <= 0;
                             state    <= DATA;
@@ -52,7 +67,7 @@ module uart_rx (
                 DATA: begin
                     if (baud_cnt == 0) begin
                         baud_cnt  <= baud_div;
-                        shift_reg <= {rx, shift_reg[7:1]};
+                        shift_reg <= {rx_sync, shift_reg[7:1]};
                         if (bit_cnt == 7) begin
                             state <= STOP;
                         end else begin
@@ -65,7 +80,7 @@ module uart_rx (
 
                 STOP: begin
                     if (baud_cnt == 0) begin
-                        if (rx == 1'b1) begin
+                        if (rx_sync == 1'b1) begin
                             data_out <= shift_reg;
                             valid    <= 1'b1;
                         end
